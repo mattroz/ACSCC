@@ -1,6 +1,7 @@
 import sys
 import os
 import re
+from sympy.parsing.sympy_parser import parse_expr
 
 def preprocess(filename):
 	"""
@@ -10,9 +11,19 @@ def preprocess(filename):
 	Returns: dict with adjacency list, adjacency matrix
 	"""
 	graph = {}
+	weights = {}
 	
 	with open(filename, 'r') as f:
 		f = open('input.txt','r')
+		
+		# Get graph dataflow (arcs' values)
+		raw_edge_info = f.readline()[:-1]
+		while raw_edge_info != '':
+			edge = raw_edge_info.replace(' ','').split('=')
+			weights[edge[0]] = parse_expr(edge[1])
+			raw_edge_info = f.readline()[:-1]
+
+		# Get graph structure
 		terminate_vertex_reached = False
 		
 		while not terminate_vertex_reached:
@@ -34,4 +45,4 @@ def preprocess(filename):
 			else:
 				graph[out_vertex][in_vertex] = weight
 
-	return graph	
+	return graph, weights	
