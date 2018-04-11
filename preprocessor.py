@@ -34,12 +34,15 @@ def preprocess(filename):
 			terminate_vertex_reached = True if squashed[1]=='END' \
 				else False
 			
-			# Fill in graph structure with the given info
+			# Fill in graph structure with the given info and
+			# weights that've been parsed before
 			if terminate_vertex_reached:
-				(out_vertex, in_vertex), weight = squashed, 0
+				(out_vertex, in_vertex), weight = squashed, 1
 			else:
 				(out_vertex, in_vertex, weight) = squashed
-
+			# Substitute given variable's string representation
+			# with the real value we've get before
+			weight = weights[weight] if weight in weights else int(weight)
 			if out_vertex not in graph:
 				graph[out_vertex] = {in_vertex: weight}
 			else:
