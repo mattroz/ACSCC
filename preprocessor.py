@@ -1,6 +1,7 @@
 import sys
 import os
 import re
+import networkx as nx
 from sympy.parsing.sympy_parser import parse_expr
 
 def preprocess(filename):
@@ -31,8 +32,7 @@ def preprocess(filename):
 			splitted = re.split(r'[->, ]', raw_string)
 			squashed = [elem for elem in splitted if elem]
 			print(squashed)
-			terminate_vertex_reached = True if squashed[1]=='END' \
-				else False
+			terminate_vertex_reached = True if squashed[1]=='END' else False
 			
 			# Fill in graph structure with the given info and
 			# weights that've been parsed before
@@ -41,11 +41,23 @@ def preprocess(filename):
 			else:
 				(out_vertex, in_vertex, weight) = squashed
 			# Substitute given variable's string representation
-			# with the real value we've get before
+			# with the real value we've get before, 1 otherwise
 			weight = weights[weight] if weight in weights else int(weight)
 			if out_vertex not in graph:
 				graph[out_vertex] = {in_vertex: weight}
 			else:
 				graph[out_vertex][in_vertex] = weight
 
-	return graph, weights	
+	return graph, weights
+
+
+def get_graph_from(filename):
+	graph, weights = preprocess(filename)
+	g = nx.DiGraph()
+	# Create directed graph
+	for parent_node in graph:
+		for child_node in graph[parent_node]:
+			w = graph[parent_node][child_node]
+			g.add_edge(parent_node, child_node, weight=w)
+	return g
+
