@@ -61,3 +61,24 @@ def get_graph_from(filename):
 			g.add_edge(parent_node, child_node, weight=w)
 	return g
 
+
+def get_direct_paths(graph, src='X', dest='END'):
+	paths = nx.all_shortest_paths(graph, source=src, target=dest)
+	paths = [p for p in paths]
+	return paths
+
+
+def get_closed_loops(graph, src='X'):
+	cycles = list(nx.simple_cycles(graph))
+	return cycles
+
+
+def calculate_transfer_function(graph, paths):
+	transfer_functions = []
+	# Calculate transfer function for every path given
+	for path in paths:
+		transfer_functions.append(1)
+		for i in range(1, len(path)-1):	
+			curr_transfer_func = graph[path[i-1]][path[i]]['weight']
+			transfer_functions[-1] *= curr_transfer_func
+	return transfer_functions
