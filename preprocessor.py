@@ -52,6 +52,15 @@ def preprocess(filename):
 
 
 def get_graph_from(filename):
+	"""Method for forming a directed graph.
+
+	Arguments:
+		filename -- file containing graph description in a specific format
+	
+	Returns:
+		g -- NetworkX directed graph
+	"""
+
 	graph, weights = preprocess(filename)
 	g = nx.DiGraph()
 	# Create directed graph
@@ -63,22 +72,55 @@ def get_graph_from(filename):
 
 
 def get_direct_paths(graph, src='X', dest='END'):
+	"""Method for obtaining a set of direct paths from src to dest node.
+
+	Arguments:
+		graph -- NetworkX directed graph
+		src -- start node for pathfinding algorithm
+		dest -- destination node for pathfinding algorithm
+	
+	Returns:
+		paths -- list of all paths from src node to dest node.
+	"""
+
 	paths = nx.all_shortest_paths(graph, source=src, target=dest)
 	paths = [p for p in paths]
 	return paths
 
 
 def get_closed_loops(graph, src='X'):
+	"""Method for obtaining a set of closed loops in the given graph.
+	
+	Arguments:
+		graph -- NetworkX directed graph
+		src -- start node for loops searching algorithm
+	
+	Returns:
+		cycles -- list of all loops from the src node in a format [(n1,n2),(n2,n3),(n3,n4), ...]
+	"""
+
 	cycles = list(nx.simple_cycles(graph))
 	return cycles
 
 
 def calculate_transfer_function(graph, paths):
+	"""Method for calculating the equivalent transfer function for every path given.
+	
+	Arguments:
+		graph -- NetworkX directed graph
+		paths -- list of paths for equivalent transfer function calculation.
+	
+	Returns:
+		transfer_functions -- list of equivalent transfer functions for the given paths (transfer_function[0] is for paths[0] and so on)
+	"""
+
 	transfer_functions = []
 	# Calculate transfer function for every path given
 	for path in paths:
 		transfer_functions.append(1)
 		for i in range(1, len(path)-1):	
-			curr_transfer_func = graph[path[i-1]][path[i]]['weight']
+			parent_node = path[i-1]
+			child_node = path[i]
+			curr_transfer_func = graph[parent_node][child_node]['weight']
 			transfer_functions[-1] *= curr_transfer_func
 	return transfer_functions
