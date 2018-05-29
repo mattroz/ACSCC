@@ -3,6 +3,7 @@ import os
 import re
 import networkx as nx
 from sympy.parsing.sympy_parser import parse_expr
+import numpy as np
 
 def preprocess(filename):
 	"""
@@ -15,7 +16,7 @@ def preprocess(filename):
 	weights = {}
 	
 	with open(filename, 'r') as f:
-		f = open('input.txt','r')
+		#f = open('input.txt','r')
 		
 		# Get graph dataflow (arcs' values)
 		raw_edge_info = f.readline()[:-1]
@@ -124,3 +125,22 @@ def calculate_transfer_function(graph, paths):
 			curr_transfer_func = graph[parent_node][child_node]['weight']
 			transfer_functions[-1] *= curr_transfer_func
 	return transfer_functions
+
+
+def find_disjoint_paths():
+	raise(NotImplementedError)
+
+
+def calculate_determinator(graph, cycles):
+	# Check cycles for intersections (TODO)
+	intersection_found = False
+	find_disjoint_paths()
+	# Calculate determinator using the formula from the Mason's rule
+	# Get transfer functions for each cycle
+	cycles_tf = calculate_transfer_function(graph, cycles)
+	combs = np.array([])
+	# Get all combinations (pairs, triplets, etc) and do sum of prods
+	for i in range(1, len(cycles_tf)):
+		comb = np.array(list(combinations(cycles_tf, i+1)))
+		comb = sum([np.prod(x) for x in comb])
+		combs = np.append(combs,c)
