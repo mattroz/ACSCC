@@ -4,6 +4,7 @@ import re
 import networkx as nx
 from sympy.parsing.sympy_parser import parse_expr
 import numpy as np
+from itertools import combinations
 
 def preprocess(filename):
 	"""
@@ -127,8 +128,25 @@ def calculate_transfer_function(graph, paths):
 	return transfer_functions
 
 
-def find_disjoint_paths():
-	raise(NotImplementedError)
+def find_disjoint_paths(cycles):
+	# Generate all combinations through the number of cycles,
+	# e.g. pairs, threes, foursome etc.
+	# Works only with len(cycles >= 2)
+	combs = []
+	for i in range(2, len(cycles)+1):
+		combs.append(list(combinations(cycles,i)))
+	# Check all the combinations for intersection:
+	# if there is no intersection, add this combination to the result list
+	disjoint_paths = []
+	for outer_comb in combs:
+		for inner_comb in outer_comb:
+			counter = 0
+			for i in range(len(inner_comb)):
+				for j in range(i+1, len(inner_comb)):
+					counter += 1 if len(set(inner_comb[i]) & set(inner_comb[j])) else 0
+			if counter == 0:
+				disjoint_paths.append(inner_comb)
+	return disjoint_paths
 
 
 def calculate_determinator(graph, cycles):
