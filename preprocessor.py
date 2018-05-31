@@ -100,8 +100,11 @@ def get_closed_loops(graph, src='X'):
 	Returns:
 		cycles -- list of all loops from the src node in a format [(n1,n2),(n2,n3),(n3,n4), ...]
 	"""
-
+	# TODO CHECK CYCLES' TRANSFER FUNCTIONS
 	cycles = list(nx.simple_cycles(graph))
+	for cycle in cycles:
+		cycle.append(cycle[0])
+		cycle.append(cycle[1])
 	return cycles
 
 
@@ -149,16 +152,44 @@ def find_disjoint_paths(cycles):
 	return disjoint_paths
 
 
+# TODO Check this function
 def calculate_determinator(graph, cycles):
-	# Check cycles for intersections (TODO)
-	intersection_found = False
-	find_disjoint_paths()
+	# Get disjoint cycles
+	disjoint_paths = find_disjoint_paths(cycles)
 	# Calculate determinator using the formula from the Mason's rule
 	# Get transfer functions for each cycle
-	cycles_tf = calculate_transfer_function(graph, cycles)
-	combs = np.array([])
-	# Get all combinations (pairs, triplets, etc) and do sum of prods
-	for i in range(1, len(cycles_tf)):
-		comb = np.array(list(combinations(cycles_tf, i+1)))
-		comb = sum([np.prod(x) for x in comb])
-		combs = np.append(combs,c)
+	cycles_tf = calculate_transfer_function(graph, disjoint_paths)#!!!
+	
+	# Split disjoint cycles into pairs, threes, foursome, etc.	
+	# DANGER! HARDCODED!
+	pairs = [pair for pair in disjoint_paths if len(pair)==2]
+	threes = [three for three in disjoint_paths if len(three)==3]
+	foursome = [foursome for foursome in disjoint_paths if len(foursome==4)]
+	# Sum of products
+	ones = calculate_transfer_function(graph, cycles)
+	set_of_paths = [cycles, ones, pairs, threes, foursome]
+	ones = sum(np.prod(x) for x in ones)
+	pairs = sum([np.prod(x) for x in pairs])
+	threes = sum([np.prod(x) for x in threes])
+	foursome = sum([np.prod(x) for x in foursome])
+	
+	det = 1 - ones + pairs - threes + foursome
+	return det
+
+
+def get_equivalent_transfer_function(graph):
+	direct_paths = get_direct_paths(graph)
+	direct_paths = calculate_transfer_function(graph, direct_paths)
+	cycles = get_closed_loops(graph)
+	disjoint_paths = find_disjoint_paths(cycles)
+	F = calculate_determinator(graph, cycles)
+	n = len(direct_paths)
+	F_i = 1	# HARDCODED
+	W = 0
+	for dir_path in direct_paths:
+		W += dir_path*F_i
+	W /= F
+	
+	return W
+	
+	
