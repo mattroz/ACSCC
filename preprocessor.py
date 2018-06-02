@@ -31,9 +31,15 @@ def preprocess(filename):
 		
 		while not terminate_vertex_reached:
 			raw_string = f.readline()[:-1]
+			# Check for -1 weight at the end of extracted string.
+			# I do this 'cause I can't get the right regexp for
+			# -1 searching in the string for now. Sorry.
+			negative = True if raw_string[-2] == '-' else False
 			splitted = re.split(r'[->, ]', raw_string)
 			squashed = [elem for elem in splitted if elem]
-			print(squashed)
+			# If there is -1 weight, substitute the 
+			if negative:
+				squashed[-1] = -1
 			terminate_vertex_reached = True if squashed[1]=='END' else False
 			
 			# Fill in graph structure with the given info and
