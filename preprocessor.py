@@ -138,9 +138,20 @@ def calculate_transfer_function(graph, paths):
 
 
 def find_disjoint_paths(cycles):
+	"""Function for disjoint paths detection.
+	
+	Arguments:
+		cycles -- list of nodes that are forming a cycle.
+	
+	Returns:
+		disjoint_paths -- list of paths without any intersection.
+	"""
+
 	# Generate all combinations through the number of cycles,
 	# e.g. pairs, threes, foursome etc.
 	# Works only with len(cycles >= 2)
+	assert len(cycles) >= 2, 'Less than two cycles'
+
 	combs = []
 	for i in range(2, len(cycles)+1):
 		combs.append(list(combinations(cycles,i)))
